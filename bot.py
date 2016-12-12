@@ -17,15 +17,22 @@
 
 
 import os
+import logging
+from math import ceil
 import telegram
 from telegram.ext import Updater, CommandHandler
-
 from yolobmsbot.google import gsheets
 
+# bot settings
 SCRIPT_DIRECTORY = os.path.dirname(__file__)  # path to directory of python script running
 CLIENT_TOKEN_FILE = os.path.join(SCRIPT_DIRECTORY, "yolobmsbot", ".user_credentials", "telegram", "bot_token")  # path to token file
+
+# bms settings
 NUMBER_OF_SEGMENTS = 8
 NUMBER_OF_CELLS_PER_SEGMENT = [17, 18, 18, 18, 18, 18, 18, 17]  # first and last segment have 1 less cell
+
+# chat settings
+KEYBOARD_CELLS = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12], [13, 14, 15], [16, 17, 18]]
 
 
 def get_bot_token():
@@ -39,6 +46,29 @@ def get_bot_token():
     return CLIENT_TOKEN
 
 
+def get_keyboard(items, max_columns):
+    """
+    :param items: []
+        List of items to setup keyboard with
+    :param max_columns: int
+        Max columns per row
+    :return: [] of []
+        List of list: each row contains at most 3 items
+    """
+
+    matrix = []
+    number_of_rows = ceil(len(items) / max_columns)
+    for r in range(number_of_rows):
+        row = []
+        for c in range(max_columns):  # loop through columns
+            try:
+                row.append(str(items[r * max_columns + c]))
+            except:
+                pass
+        matrix.append(row)
+    return matrix
+
+
 class YoloBmsBot(object):
     """ Remote Bms Raceup bot """
 
@@ -46,6 +76,8 @@ class YoloBmsBot(object):
         object.__init__(self)
 
         self.updater = Updater(get_bot_token())
+        self.dp = self.updater.dispatcher  # get the dispatcher to register handlers
+        self.dp.add_error_handler(self.error)  # log errors
         self.setup_commands()  # setup commands
 
     def run(self):
@@ -55,7 +87,7 @@ class YoloBmsBot(object):
         """
 
         self.updater.start_polling()
-        self.updater.idle()
+        self.updater.idle()  # run the bot until the user presses Ctrl-C or the process receives SIGINT, SIGTERM or SIGABRT
 
     def setup_commands(self):
         """
@@ -63,17 +95,9 @@ class YoloBmsBot(object):
             Setup bot commmands
         """
 
-        self.updater.dispatcher.add_handler(CommandHandler("start", self.start))
-        self.updater.dispatcher.add_handler(CommandHandler("help", self.start))
-        self.updater.dispatcher.add_handler(CommandHandler("segment", self.get_current_segment_average_value))
-        self.updater.dispatcher.add_handler(CommandHandler("cell", self.get_current_cell_value))
-
-    @staticmethod
-    def help(bot, update):
-        message = "Receive updates about the Raceup remote bms." \
-                  "Go to the official page https://sites.google.com/view/raceupbms for more information."\
-            .format(update.message.from_user.first_name)
-        update.message.reply_text(message)
+        self.dp.add_handler(CommandHandler("start", self.start))
+        self.dp.add_handler(CommandHandler("segment", self.get_segment_average_value))
+        self.dp.add_handler(CommandHandler("cell", self.get_cell_value))
 
     @staticmethod
     def start(bot, update):
@@ -82,42 +106,87 @@ class YoloBmsBot(object):
         update.message.reply_text(message)
 
     @staticmethod
-    def get_current_segment_average_value(bot, update):
+    def error(bot, update, error):
+        """
+        :param bot: bot
+            Bot to use
+        :param update: updater
+            Updater of bot chat
+        :param error: string
+            Exception string
+        :return: void
+            Logs exception
+        """
+
+        logging.error('Update "%s" caused error "%s"' % (update, error))
+
+    @staticmethod
+    def get_segment_average_value(bot, update):
+        """
+        :param bot: bot
+            Bot to use
+        :param update: updater
+            Updater of bot chat
+        :return: void
+            Prompt user then returns value to screen
+        """
+
         # TODO: set keyboard with segment to choose
         message_text = str(update.message.text)  # get text of user message
-        segment = int(message_text.split(" ")[-1])  # parse segment
+        args = message_text.split(" ")
 
-        if segment not in range(NUMBER_OF_SEGMENTS):
-            message = "Sorry " + update.message.from_user.first_name + " but the segment " + str(segment) + " does not exists!"
-            message += "\nPossible segments are from 1 to " + str(NUMBER_OF_SEGMENTS)
+        if len(args) < 2:
+            message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment!\ne.g \"/segment 1\""
         else:
-            value, time = gsheets.get_last_segment_value(segment - 1)
-            message = "Latest value of segment " + str(segment) + " is " + str(value) + " as of " + str(time) + ".\n" + str(message_text)
+            segment = int(args[-1])  # parse segment
+            if segment not in range(1, NUMBER_OF_SEGMENTS + 1):
+                message = "Sorry " + update.message.from_user.first_name + " but the segment " + str(
+                    segment) + " does not exists!"
+                message += "\nPossible segments are from 1 to " + str(NUMBER_OF_SEGMENTS)
+            else:
+                value, time = gsheets.get_last_segment_value(segment - 1)
+                time_date = time.split(" ")[0]
+                time_hours = time.split(" ")[1]
+                message = "Latest value of segment " + str(segment) + " is " + "{0:.2f}".format(float(value)) + " mV" +\
+                          " as of " + str(time_date) + " at " + str(time_hours) + ".\n"
         update.message.reply_text(message)  # send message
 
     @staticmethod
-    def get_current_cell_value(bot, update):
-        # TODO: set keyboard with segment to choose
-        # TODO: set keyboard with cell to choose
+    def get_cell_value(bot, update):
+        """
+        :param bot: bot
+            Bot to use
+        :param update: updater
+            Updater of bot chat
+        :return: void
+            Prompt user then returns value to screen
+        """
 
+        # TODO: set keyboard with segment to choose, set keyboard with cell to choose
         message_text = str(update.message.text)  # get text of user message
-        cell = int(message_text.split(" ")[-2])  # read cell
-        segment = int(message_text.split(" ")[-1])  # parse segment
+        args = message_text.split(" ")
 
-        if segment not in range(NUMBER_OF_SEGMENTS) or cell not in range(NUMBER_OF_CELLS_PER_SEGMENT[segment - 1]):
-            message = "Sorry " + update.message.from_user.first_name + " but the cell " + str(cell) + " does not exists in the segment " + str(segment)
-
-            if segment not in range(NUMBER_OF_SEGMENTS):
-                message += "\nPossible segments are from 1 to " + str(NUMBER_OF_SEGMENTS)
-            else:  # segment is right
-                if cell not in range(NUMBER_OF_CELLS_PER_SEGMENT[segment - 1]):
-                    message += "\nPossible cells in segment " + str(segment) + " are from 1 to " + str(NUMBER_OF_CELLS_PER_SEGMENT[segment - 1])
+        if len(args) < 3:
+            message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment and a cell!\ne.g \"/cell 1 2\""
         else:
-            value, time = gsheets.get_last_cell_value(cell - 1, segment - 1)
-            message = "Latest value of cell " + str(cell) + " in segment " + str(segment) + " is " + str(value) + " as of " + str(time) + ".\n" + str(message_text)
+            cell = int(args[-2])  # read cell
+            segment = int(args[-1])  # parse segment
 
+            if segment not in range(1, NUMBER_OF_SEGMENTS + 1) or cell not in range(1, NUMBER_OF_CELLS_PER_SEGMENT[segment - 1] + 1):
+                message = "Sorry " + update.message.from_user.first_name + " but the cell " + str(cell) + " does not exists in the segment " + str(segment)
+
+                if segment not in range(1, NUMBER_OF_SEGMENTS + 1):
+                    message += "\nPossible segments are from 1 to " + str(NUMBER_OF_SEGMENTS)
+                else:  # segment is right
+                    if cell not in range(NUMBER_OF_CELLS_PER_SEGMENT[segment - 1]):
+                        message += "\nPossible cells in segment " + str(segment) + " are from 1 to " + str(NUMBER_OF_CELLS_PER_SEGMENT[segment - 1])
+            else:
+                value, time = gsheets.get_last_cell_value(cell - 1, segment - 1)
+                time_date = time.split(" ")[0]
+                time_hours = time.split(" ")[1]
+                message = "Latest value of cell " + str(cell) + " in segment " + str(segment) + " is " + "{0:.2f}".format(float(value)) + " mV" +\
+                          " as of " + str(time_date) + " at " + str(time_hours) + ".\n"
         update.message.reply_text(message)  # send message
-
 
 if __name__ == '__main__':
     bot = YoloBmsBot()

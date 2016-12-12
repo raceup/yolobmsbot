@@ -42,6 +42,33 @@ SPREADSHEETS_MIN_COLUMN = "A"  # min column in spreadsheets
 SPREADSHEETS_MIN_ROW = "2"  # mIN row in spreadsheets
 SPREADSHEETS_MAX_ROW = "5001"  # max row in spreadsheets
 SPREADSHEETS_TOP_LEFT_CORNER = SPREADSHEETS_MIN_COLUMN + SPREADSHEETS_MIN_ROW  # top left corner in spreadsheets0
+SPREADSHEET_COLUMNS = ["B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"]
+
+
+def get_last_row_of_column(spreadsheet, column, max_rows=9999):
+    """
+    :param spreadsheet: string
+        Spreadsheet ID
+    :param column: string
+        Column to get last row of
+    :param max_rows: int
+        Max rows to search
+    :return: int
+        Number of last row
+    """
+
+    service = gauthenticator.create_gdrive_driver()
+    for row in range(1, max_rows):
+        range_name = column + str(row)
+        try:
+            value = service.spreadsheets().values().get(
+                spreadsheetId=spreadsheet, range=range_name
+            ).execute().get("values", [])[0]  # get values
+            if len(str(value)) < 1:  # if cell is empty
+                return row - 1
+        except:
+            return row - 1
+    return max_rows
 
 
 def get_last_segment_value(segment):
@@ -52,8 +79,18 @@ def get_last_segment_value(segment):
         Last value of cell, time of last update
     """
 
-    # TODO: find last row, then get range right, then get value
-    return 0.0, "12:00 2016-12-12"
+    service = gauthenticator.create_gdrive_driver()  # get new sheets instance
+    column = SPREADSHEET_COLUMNS[segment]  # get column of segment
+    row = get_last_row_of_column(SPREADSHEET_PACK_ID, column)  # get row of last cell
+
+    data_value = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_PACK_ID, range=column + str(row)
+    ).execute().get("values", [])[0][0]  # get cell value
+    data_time = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_PACK_ID, range=SPREADSHEETS_MIN_COLUMN + str(row)
+    ).execute().get("values", [])[0][0]  # get time value
+
+    return data_value, data_time
 
 
 def get_last_cell_value(cell, segment):
@@ -66,5 +103,15 @@ def get_last_cell_value(cell, segment):
         Last value of cell, time of last update
     """
 
-    # TODO: find last row, then get range right, then get value
-    return 0.0, "12:00 2016-12-12"
+    service = gauthenticator.create_gdrive_driver()  # get new sheets instance
+    column = SPREADSHEET_COLUMNS[cell]  # get column of segment
+    row = get_last_row_of_column(SPREADSHEET_SEGMENT_ID[segment], column)  # get row of last cell
+
+    data_value = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_SEGMENT_ID[segment], range=column + str(row)
+    ).execute().get("values", [])[0][0]  # get cell value
+    data_time = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_SEGMENT_ID[segment], range=SPREADSHEETS_MIN_COLUMN + str(row)
+    ).execute().get("values", [])[0][0]  # get time value
+
+    return data_value, data_time
