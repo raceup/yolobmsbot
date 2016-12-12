@@ -1,5 +1,5 @@
 # YoloBmsBot: a Telegram bot to receive updates about the Raceup remote bms.
-*Receive updates from https://sites.google.com/view/raceupbms.*
+*Receive updates from [the official webpage](https://sites.google.com/view/raceupbms).*
 
 
 ## Install & Run
