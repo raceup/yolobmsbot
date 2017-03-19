@@ -1,1 +1,23 @@
-{"token_response": {"token_type": "Bearer", "expires_in": 3600, "access_token": "ya29.CjCyA0els5mJTtICRFlW8vHyGXwE8anFHhACrsxU5R8wLDNnXJNLDrg3VFoSL8kjVCM"}, "id_token": null, "refresh_token": "1/GZuWQesfWas1PYKhX13cm4aMjVV6bYy_16OLppGTmxg", "token_info_uri": "https://www.googleapis.com/oauth2/v3/tokeninfo", "revoke_uri": "https://accounts.google.com/o/oauth2/revoke", "scopes": ["https://www.googleapis.com/auth/spreadsheets"], "token_expiry": "2016-12-12T18:15:38Z", "client_secret": "71gsbUrszP0Zt8z-POvK2RfG", "token_uri": "https://accounts.google.com/o/oauth2/token", "client_id": "626143938296-00ejuapnboulc94ckgeen5dior76ejbk.apps.googleusercontent.com", "_module": "oauth2client.client", "access_token": "ya29.CjCyA0els5mJTtICRFlW8vHyGXwE8anFHhACrsxU5R8wLDNnXJNLDrg3VFoSL8kjVCM", "_class": "OAuth2Credentials", "invalid": false, "user_agent": "Bms Remote Monitor"}
+{
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "scopes": [
+    "https://www.googleapis.com/auth/spreadsheets"
+  ],
+  "invalid": false,
+  "token_response": {
+    "access_token": "ya29.Gl0TBOkVu8aaAGj2d5gOLWw4GbOkZR-bxohyryQBYizrkNi9wAjxIZ5BEe32XRSTjeqY3_wbDGchtDm0lLm8qd2Xgk-dfTXAyrLdW3b764uu1VQfC_FjSFZUXYJ8WVo",
+    "token_type": "Bearer",
+    "expires_in": 3600
+  },
+  "_class": "OAuth2Credentials",
+  "user_agent": "Bms Remote Monitor",
+  "access_token": "ya29.Gl0TBOkVu8aaAGj2d5gOLWw4GbOkZR-bxohyryQBYizrkNi9wAjxIZ5BEe32XRSTjeqY3_wbDGchtDm0lLm8qd2Xgk-dfTXAyrLdW3b764uu1VQfC_FjSFZUXYJ8WVo",
+  "revoke_uri": "https://accounts.google.com/o/oauth2/revoke",
+  "id_token": null,
+  "client_id": "626143938296-00ejuapnboulc94ckgeen5dior76ejbk.apps.googleusercontent.com",
+  "token_info_uri": "https://www.googleapis.com/oauth2/v3/tokeninfo",
+  "_module": "oauth2client.client",
+  "refresh_token": "1/GZuWQesfWas1PYKhX13cm4aMjVV6bYy_16OLppGTmxg",
+  "token_expiry": "2017-03-19T20:47:50Z",
+  "client_secret": "71gsbUrszP0Zt8z-POvK2RfG"
+}

@@ -16,11 +16,12 @@
 # limitations under the License.
 
 
-import os
 import logging
+import os
 from math import ceil
-import telegram
+
 from telegram.ext import Updater, CommandHandler
+
 from yolobmsbot.google import gsheets
 
 # bot settings
@@ -41,9 +42,9 @@ def get_bot_token():
         Authenticate bot
     """
 
-    CLIENT_TOKEN = open(CLIENT_TOKEN_FILE, "r").read()
-    CLIENT_TOKEN = CLIENT_TOKEN.strip()
-    return CLIENT_TOKEN
+    client_token = open(CLIENT_TOKEN_FILE, "r").read()
+    client_token = client_token.strip()
+    return client_token
 
 
 def get_keyboard(items, max_columns):
@@ -138,6 +139,9 @@ class YoloBmsBot(object):
         if len(args) < 2:
             message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment!\ne.g \"/segment 1\""
         else:
+            wait_message = "Please, let me compute the query..."
+            update.message.reply_text(wait_message)
+
             segment = int(args[-1])  # parse segment
             if segment not in range(1, NUMBER_OF_SEGMENTS + 1):
                 message = "Sorry " + update.message.from_user.first_name + " but the segment " + str(
@@ -169,6 +173,9 @@ class YoloBmsBot(object):
         if len(args) < 3:
             message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment and a cell!\ne.g \"/cell 1 2\""
         else:
+            wait_message = "Please, let me compute the query..."
+            update.message.reply_text(wait_message)
+
             cell = int(args[-2])  # read cell
             segment = int(args[-1])  # parse segment
 

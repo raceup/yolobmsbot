@@ -16,9 +16,6 @@
 # limitations under the License.
 
 
-import time
-
-from .. import utils
 from yolobmsbot.google import gauthenticator
 
 

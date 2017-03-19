@@ -17,12 +17,12 @@
 
 
 import os
+
 import httplib2
 from googleapiclient import discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
-
 
 SCRIPT_DIRECTORY = os.path.dirname(__file__)  # path to directory of python script running
 
