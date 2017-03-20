@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 0.2.2 - 2017-03-20
+
+### Removed
+- pi folder with installer
 
 ## 0.2.1 - 2017-03-19
 
