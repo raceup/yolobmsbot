@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - wait message before query parsed
 - debug info when answering query
+- pi service conf
 
 ## 0.2 - 2016-12-12
 

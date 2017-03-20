@@ -1,0 +1,15 @@
+[Unit]
+Description=YoloBmsBot: a Telegram bot to receive updates about the Raceup remo$
+After=syslog.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Raceup/Ed/Elettronica/projects/bms/bms-telegram-bot/
+ExecStart=/usr/bin/python3 bot.py
+Restart=on-abort
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

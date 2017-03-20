@@ -137,7 +137,7 @@ class YoloBmsBot(object):
         args = message_text.split(" ")
 
         if len(args) < 2:
-            message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment!\ne.g \"/segment 1\""
+            message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment (in [1, 8])!\ne.g \"/segment 1\""
         else:
             wait_message = "Please, let me compute the query..."
             update.message.reply_text(wait_message)
@@ -175,7 +175,7 @@ class YoloBmsBot(object):
         args = message_text.split(" ")
 
         if len(args) < 3:
-            message = "Sorry " + update.message.from_user.first_name + " but you have to specify the cell and the segment!\ne.g \"/cell 1 2\""
+            message = "Sorry " + update.message.from_user.first_name + " but you have to specify the cell and the segment (in [1, 17(18)] x [1, 8])!\ne.g \"/cell 1 2\""
         else:
             wait_message = "Please, let me compute the query..."
             update.message.reply_text(wait_message)
