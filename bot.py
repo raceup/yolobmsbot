@@ -151,6 +151,10 @@ class YoloBmsBot(object):
                 value, time = gsheets.get_last_segment_value(segment - 1)
                 time_date = time.split(" ")[0]
                 time_hours = time.split(" ")[1]
+
+                print("\tGetting value of average of segment", segment, "for", update.message.from_user.first_name)
+                print("\tValue updated in", str(time_date), "at", str(time_hours))
+
                 message = "Latest value of segment " + str(segment) + " is " + "{0:.2f}".format(float(value)) + " mV" +\
                           " as of " + str(time_date) + " at " + str(time_hours) + ".\n"
         update.message.reply_text(message)  # send message
@@ -171,7 +175,7 @@ class YoloBmsBot(object):
         args = message_text.split(" ")
 
         if len(args) < 3:
-            message = "Sorry " + update.message.from_user.first_name + " but you have to specify a segment and a cell!\ne.g \"/cell 1 2\""
+            message = "Sorry " + update.message.from_user.first_name + " but you have to specify the cell and the segment!\ne.g \"/cell 1 2\""
         else:
             wait_message = "Please, let me compute the query..."
             update.message.reply_text(wait_message)
@@ -191,6 +195,11 @@ class YoloBmsBot(object):
                 value, time = gsheets.get_last_cell_value(cell - 1, segment - 1)
                 time_date = time.split(" ")[0]
                 time_hours = time.split(" ")[1]
+
+                print("\tGetting value of cell", cell, "in segment", segment, "for",
+                      update.message.from_user.first_name)
+                print("\tValue updated in", str(time_date), "at", str(time_hours))
+
                 message = "Latest value of cell " + str(cell) + " in segment " + str(segment) + " is " + "{0:.2f}".format(float(value)) + " mV" +\
                           " as of " + str(time_date) + " at " + str(time_hours) + ".\n"
         update.message.reply_text(message)  # send message

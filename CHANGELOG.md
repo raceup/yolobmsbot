@@ -2,13 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
-### TODO
-- merge with remote-bms in raspberry
-
 ## 0.2.1 - 2017-03-19
 
 ### Added
 - wait message before query parsed
+- debug info when answering query
 
 ## 0.2 - 2016-12-12
 
