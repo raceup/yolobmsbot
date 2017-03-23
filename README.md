@@ -6,10 +6,6 @@
 Open your Telegram app client and search for @yolobmsbot. Then start chatting.
 
 
-## Usage
-```ask for awesome and you'll find me```
-
-
 ## Thanks
 Thanks to Gorgo for the inspiration. 
 
