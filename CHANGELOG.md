@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 0.2.3 - 2017-04-09
+
+### Added
+- battery pack model
+
 ## 0.2.2 - 2017-03-20
 
 ### Removed
