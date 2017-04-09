@@ -23,6 +23,7 @@ from math import ceil
 
 from telegram.ext import Updater, CommandHandler
 
+from yolobmsbot import logs
 from yolobmsbot.batterypack import BatteryPack, BatteryCellValue
 from yolobmsbot.google import gsheets
 
@@ -83,6 +84,8 @@ class BatteryPackUpdater(object):
 class YoloBmsBot(object):
     """ Remote Bms Raceup bot """
 
+    QUERY_WAIT_MESSAGE = "Please let me compute the query ... it may take a few moments"
+
     def __init__(self, b_pack):
         """
         :param b_pack: BatteryPack
@@ -119,6 +122,13 @@ class YoloBmsBot(object):
         self.dp.add_handler(CommandHandler("cell", self.reply_cell_command))
 
     def start(self, update):
+        logs.log_users(
+            update.message.from_user.id,
+            update.message.from_user.first_name,
+            update.message.from_user.last_name,
+            update.message.from_user.username
+        )  # log
+
         message = "Hello {}! I'm here to provide you with information about the RaceUp Bms" \
             .format(update.message.from_user.first_name)
         update.message.reply_text(message)
@@ -143,8 +153,9 @@ class YoloBmsBot(object):
             Prompt user then returns value to screen
         """
 
+        logs.log_user_action(update.message.from_user.first_name, str(update.message.text))  # log
         message_text = str(update.message.text)  # get text of user message
-        update.message.reply_text("Please let me compute the query ... it may take a few moments")
+        update.message.reply_text(self.QUERY_WAIT_MESSAGE)
         self.values_updater.update_values()  # update values
 
         args = message_text.split(" ")
@@ -198,8 +209,10 @@ class YoloBmsBot(object):
             Prompt user then returns value to screen
         """
 
+        user_name = update.message.from_user.first_name + update.message.from_user.last_name + " (" + update.message.from_user.username + ")"
+        logs.log_user_action(str(user_name), str(update.message.text))  # log
         message_text = str(update.message.text)  # get text of user message
-        update.message.reply_text("Please let me compute the query ... it may take a few moments")
+        update.message.reply_text(self.QUERY_WAIT_MESSAGE)
         self.values_updater.update_values()  # update values
 
         args = message_text.split(" ")

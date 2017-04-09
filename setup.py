@@ -46,7 +46,7 @@ setup(
         "apiclient",
         "inflect",
         "httplib2",
-        "python-telegram-bot"
+        "python-telegram-bot", 'telegram'
     ],
     test_suite="tests"
 )
