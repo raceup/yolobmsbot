@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - battery pack model
+- battery pack updater
 
 ## 0.2.2 - 2017-03-20
 

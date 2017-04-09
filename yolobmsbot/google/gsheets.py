@@ -61,6 +61,7 @@ def get_last_row_of_column(spreadsheet, column, max_rows=9999):
             value = service.spreadsheets().values().get(
                 spreadsheetId=spreadsheet, range=range_name
             ).execute().get("values", [])[0]  # get values
+
             if len(str(value)) < 1:  # if cell is empty
                 return row - 1
         except:
@@ -90,6 +91,27 @@ def get_last_segment_value(segment):
     return data_value, data_time
 
 
+def get_last_segments_values():
+    """
+    :return: tuple [], str
+        Array of last values of segments and the time of last value update
+    """
+
+    service = gauthenticator.create_gdrive_driver()  # get new sheets instance
+    min_column = SPREADSHEET_COLUMNS[0]
+    max_column = SPREADSHEET_PACK_MAX_COLUMN
+    row = get_last_row_of_column(SPREADSHEET_PACK_ID, min_column)  # get row of last values
+
+    data_values = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_PACK_ID, range=min_column + str(row) + ":" + max_column + str(row)
+    ).execute().get("values", [])[0]  # get cell values # TODO test
+    data_time = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_PACK_ID, range=SPREADSHEETS_MIN_COLUMN + str(row)
+    ).execute().get("values", [])[0][0]  # get time value
+
+    return data_values, data_time
+
+
 def get_last_cell_value(cell, segment):
     """
     :param cell: int
@@ -112,3 +134,26 @@ def get_last_cell_value(cell, segment):
     ).execute().get("values", [])[0][0]  # get time value
 
     return data_value, data_time
+
+
+def get_last_cells_values(segment):
+    """
+    :param segment: int
+        Number of segment of cell (starts from 0)
+    :return: tuple [], str
+        Array of last values of cells in given segment and the time of last value update
+    """
+
+    service = gauthenticator.create_gdrive_driver()  # get new sheets instance
+    min_column = SPREADSHEET_COLUMNS[0]
+    max_column = SPREADSHEET_COLUMNS[-1]
+    row = get_last_row_of_column(SPREADSHEET_SEGMENT_ID[segment], min_column)  # get row of last cell
+
+    data_values = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_SEGMENT_ID[segment], range=min_column + str(row) + ":" + max_column + str(row)
+    ).execute().get("values", [])[0]  # get cell values # TODO test
+    data_time = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_SEGMENT_ID[segment], range=SPREADSHEETS_MIN_COLUMN + str(row)
+    ).execute().get("values", [])[0][0]  # get time value
+
+    return data_values, data_time
