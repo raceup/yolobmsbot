@@ -111,7 +111,13 @@ class BatterySegment(object):
             Sum of all cells' values
         """
 
-        return sum([cell.get(key) for cell in self.cells])  # sum all values
+        s = 0
+        for c in self.cells:
+            try:
+                s += float(c.get(key))
+            except:
+                s += 0.0
+        return s  # sum all values
 
     def get_average(self, key):
         """
@@ -215,6 +221,6 @@ class BatteryPack(object):
             True iff cell position is valid
         """
 
-        segment_in_range = segment in range(len(self.segments))
-        cell_in_range = cell not in range(len(self.segments[segment]))
-        return not (segment_in_range and not (not cell_in_range))
+        segment_in_range = segment in range(0, len(self.segments))
+        cell_in_range = cell in range(0, len(self.segments[segment].cells))
+        return segment_in_range and cell_in_range

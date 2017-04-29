@@ -55,7 +55,7 @@ def get_last_row_of_column(spreadsheet, column, max_rows=9999):
     """
 
     service = gauthenticator.create_gdrive_driver()
-    for row in range(1, max_rows):
+    for row in range(1, max_rows, 2):
         range_name = column + str(row)
         try:
             value = service.spreadsheets().values().get(
@@ -63,9 +63,9 @@ def get_last_row_of_column(spreadsheet, column, max_rows=9999):
             ).execute().get("values", [])[0]  # get values
 
             if len(str(value)) < 1:  # if cell is empty
-                return row - 1
+                return row - 2
         except:
-            return row - 1
+            return row - 2
     return max_rows
 
 
@@ -136,10 +136,12 @@ def get_last_cell_value(cell, segment):
     return data_value, data_time
 
 
-def get_last_cells_values(segment):
+def get_last_cells_values(segment, row=None):
     """
     :param segment: int
         Number of segment of cell (starts from 0)
+    :param row: int
+        Row of last values
     :return: tuple [], str
         Array of last values of cells in given segment and the time of last value update
     """
@@ -147,13 +149,22 @@ def get_last_cells_values(segment):
     service = gauthenticator.create_gdrive_driver()  # get new sheets instance
     min_column = SPREADSHEET_COLUMNS[0]
     max_column = SPREADSHEET_COLUMNS[-1]
-    row = get_last_row_of_column(SPREADSHEET_SEGMENT_ID[segment], min_column)  # get row of last cell
+    if row is None:
+        row = get_last_row_of_column(SPREADSHEET_SEGMENT_ID[segment], min_column)  # get row of last cell
 
-    data_values = service.spreadsheets().values().get(
-        spreadsheetId=SPREADSHEET_SEGMENT_ID[segment], range=min_column + str(row) + ":" + max_column + str(row)
-    ).execute().get("values", [])[0]  # get cell values # TODO test
-    data_time = service.spreadsheets().values().get(
-        spreadsheetId=SPREADSHEET_SEGMENT_ID[segment], range=SPREADSHEETS_MIN_COLUMN + str(row)
-    ).execute().get("values", [])[0][0]  # get time value
+    has_data = False
+    data_values = ["", ""]
+    while not has_data and row >= 1:
+        try:
+            data_values = service.spreadsheets().values().get(
+                spreadsheetId=SPREADSHEET_SEGMENT_ID[segment],
+                range=SPREADSHEETS_MIN_COLUMN + str(row) + ":" + max_column + str(row)
+            ).execute().get("values", [])[0]  # get cell values
+            has_data = True
+        except:
+            row -= 1
 
-    return data_values, data_time
+    data_time = data_values[0]  # get time value
+    data_values = data_values[1:]
+
+    return data_values, data_time, row

@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 0.2.5 - 2017-04-29
+
+### Tested
+- new credentials
+- users/messages logging
+- bot (it works)
+
+### Changed
+- bot has no more a values_updater obj
+
 ## 0.2.4 - 2017-04-09
 
 ### Added

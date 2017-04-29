@@ -16,23 +16,15 @@
 # limitations under the License.
 
 import os
+import time
 from datetime import datetime
 
 DATETIME_NOW = datetime.now()
-LOG_FOLDER = "/home/pi/Raceup/Ed/Elettronica/projects/bms/bms-telegram-bot/data" + str(DATETIME_NOW.month) + "-" + str(
-    DATETIME_NOW.day) + "-" + str(DATETIME_NOW.hour) + "-" + str(DATETIME_NOW.minute)
-LOG_FILES = [os.path.join(LOG_FOLDER, "users"), os.path.join(LOG_FOLDER, "messages")]
-
-
-def setup_logs():
-    """
-    :return: void
-        Prepare and setup log files
-    """
-
-    for log_file in LOG_FILES:
-        if not os.path.exists(log_file):
-            os.makedirs(log_file)
+SCRIPT_DIRECTORY = os.path.dirname(__file__)  # path to directory of python script running
+LOG_FOLDER = os.path.join(os.path.dirname(os.path.realpath(__file__)), str(int(time.time())) + "-logs")
+if not os.path.exists(LOG_FOLDER):  # create necessary folders
+    os.makedirs(LOG_FOLDER)
+LOG_FILES = [os.path.join(LOG_FOLDER, "users.csv"), os.path.join(LOG_FOLDER, "actions.csv")]
 
 
 def log_users(user_id, user_first_name, user_last_name, user_username):
@@ -49,9 +41,12 @@ def log_users(user_id, user_first_name, user_last_name, user_username):
         Log user name to log file
     """
 
-    time_now = datetime.now()
-    log_values_to_file(LOG_FILES[0],
-                       [str(time_now), str(user_id), str(user_first_name), str(user_last_name), str(user_username)])
+    log_values_to_file(
+        LOG_FILES[0],
+        [
+            str(datetime.now()), str(user_id), str(user_first_name), str(user_last_name), str(user_username)
+        ]
+    )
 
 
 def log_user_action(user, action):
@@ -79,5 +74,33 @@ def log_values_to_file(log_file, values):
     """
 
     with open(log_file, "a") as logger:
-        new_row = ",".join(values) + "\n"
+        str_val = ["\"" + str(v) + "\"" for v in values]
+        new_row = ",".join(str_val)
         logger.write(new_row)
+        logger.write("\n")
+
+
+def setup_log_files():
+    """
+    :return: void
+        Append headers to log files
+    """
+
+    log_values_to_file(
+        LOG_FILES[0],
+        [
+            "time %Y-%m-%d %H:%M:%S",
+            "user id",
+            "first name",
+            "last name"
+        ]
+    )
+
+    log_values_to_file(
+        LOG_FILES[1],
+        [
+            "time %Y-%m-%d %H:%M:%S",
+            "user id",
+            "action"
+        ]
+    )
